@@ -61,10 +61,19 @@ public:
 // .second: zwart default. Pas rood kleuren indien niet anders kan
     pair<pair<int,int>,int> is_kleurbaar_rec();
 
+// kleurt de boom (indien hij kleurbaar is)
+    void kleur();
+
 //geeft de voorganger als de linkerboom niet leeg is
     Rzwboom<T,D>* ondervoorganger(Rzwknoop<T,D>*);
     bool ouderOK();
 private:
+// duwt rood in de deelboom
+    void duw();
+
+// corrigeert 2 keer rood na elkaar door wortel zwart te maken en rood te duwen naar beneden
+    void corrigeer();
+
     void schrijf(ostream&);
     int geefkleur(){
         if (k!=0)
@@ -105,6 +114,57 @@ class Rzwknoop{
         Rzwknoop<T,D>(const T& _sl,const D& _data):
                 ouder(0),sl(_sl),data(_data),rzw(Rzwboom<T,D>::rood){}
 };
+
+template <class T,class D>
+void Rzwboom<T,D>::kleur() {
+    if( this->is_kleurbaar() ) {
+
+        int diepte_links = this->k->links.zwartediepte();
+        int diepte_rechts = this->k->rechts.zwartediepte();
+
+        if( diepte_links != diepte_rechts ) {
+            if( diepte_links > diepte_rechts ) {
+                this->k->links.duw();   // links roder maken
+            } else {
+                this->k->rechts.duw();
+            }
+        } else {
+            this->k->rzw = zwart;
+        }
+    } else {
+        cout << "Niet inkleurbaar" << endl;
+    }
+}
+
+// maakt de wortel van de boom rood
+// indien al rood, wordt dit rood verder geduwd naar zijn kinderen
+template <class T,class D>
+void Rzwboom<T,D>::duw() {
+    // wortel deelboom al rood = dubbel rood
+    if( this->geefkleur() == rood ) {
+        this->k->links.duw();
+        this->k->rechts.duw();
+    }
+    //  controle 2 keer rood na elkaar
+    else if ( this->k->links.geefkleur() == rood ) {
+        this->k->links.corrigeer();
+    }
+    else if ( this->k->rechts.geefkleur() == rood ) {
+        this->k->rechts.corrigeer();
+    }
+    else {
+        this->k->rzw = rood;
+    }
+}
+
+// bij 2 rode knopen na elkaar
+// wortel zwart maken en rood duwen naar zijn kinderen
+template <class T, class D>
+void Rzwboom<T,D>::corrigeer() {
+    this->k->rzw = zwart;
+    this->k->links.duw();
+    this->k->rechts.duw();
+}
 
 template <class T,class D>
 int Rzwboom<T,D>::diepte() {

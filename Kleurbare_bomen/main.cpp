@@ -19,5 +19,9 @@ int main()
 	cout << "Rood zwarte diepte : " << boom.zwartediepterec().first << endl;
     cout << "Is kleurbaar: " << boom.is_kleurbaar() << endl;
 
+    boom.kleur();
+
+    cout << boom << endl;
+
     return 0;
 }
