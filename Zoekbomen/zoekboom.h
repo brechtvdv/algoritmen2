@@ -1,7 +1,7 @@
 /**********************************************************************
 
 
-   beschrijving: Deze code bevat fouten !!!!!!!!!!!!!!!!
+   beschrijving: Deze code bevat fouten !!!!!!!!!!!!!!!!1
 
 ***************************************************************************/
 #ifndef __ZOEKBOOM_H
@@ -48,6 +48,9 @@ public:
 //pointer naar wortelknoop
      Binknoop<Sleutel,Data>* k;
 //     Binknoop* voorloper(Binknoop*);
+
+    // test binaire boom
+    bool is_binaire_boom();
 };
 
 template <class Sleutel,class Data>
@@ -75,7 +78,7 @@ template <class Sleutel,class Data>
 class Zoekboom{
 public:
      virtual void voegtoe(const Sleutel&,const Data&);
-     virtual void voegtoe(Binknoop<Sleutel,Data> knoop, const Sleutel&,const Data&);
+     virtual void voegtoe(Binknoop<Sleutel,Data> &knoop, const Sleutel&,const Data&);
 //volgende functie doet niets als er geen knoop is met het gegeven Sleutel
      virtual void verwijder(const Sleutel&);
 //geef pointer naar data horend bij een sleutel
@@ -85,15 +88,42 @@ public:
         b.deBinboom.schrijf(os);
         return os;
     };
+    //De binaire boom die de data bevat
+     Binboom<Sleutel,Data> deBinboom;
 protected:
 //zoekplaats: geeft adres van boom waaraan knoop hangt, of zou moeten hangen
 //en adres van de ouder.
      virtual void zoekplaats(const Sleutel&,Binboom<Sleutel,Data>*&,Binknoop<Sleutel,Data>*&);
-//De binaire boom die de data bevat
-     Binboom<Sleutel,Data> deBinboom;
+
 //geeft de voorganger. Veronderstelt dat de linkerboom onder de knoop niet leeg is
      Binboom<Sleutel,Data>* ondervoorganger(Binknoop<Sleutel,Data>*);
 };
+
+template <class Sleutel,class Data>
+bool Binboom<Sleutel, Data>::is_binaire_boom()
+{
+
+
+  if (k == 0)
+    return 1;
+
+    // todo: is linkerkind zijn ouder, ik?
+
+  /* false if left is > than node */
+  if (k->links.k != 0 && k->links.k->ouder == k && k->links.k->data > k->data)
+    return 0;
+
+  /* false if right is < than node */
+  if (k->rechts.k != 0 && k->rechts.k->ouder == k && k->rechts.k->data < k->data)
+    return 0;
+
+  /* false if, recursively, the left or right is not a BST */
+  if (!k->links.is_binaire_boom() || !k->rechts.is_binaire_boom())
+    return 0;
+
+  /* passing all that, it's a BST */
+  return 1;
+}
 
 template <class Sleutel,class Data>
 void Binboom<Sleutel,Data>::roteer(bool links){
@@ -113,6 +143,7 @@ void Binboom<Sleutel,Data>::roteer(bool links){
         if (op->rechts.k!=0)
             op->rechts.k->ouder=neer;
     }
+
     k=op;
     op->ouder=neer->ouder;
     neer->ouder=op;
@@ -145,25 +176,27 @@ Data* Zoekboom<Sleutel,Data>::zoekdata(const Sleutel& sl){
 
 template <class Sleutel,class Data>
 void Zoekboom<Sleutel,Data>::voegtoe(const Sleutel& sl,const Data& data){
-    if(k==0){
-        k=new Binknoop<Sleutel,Data>(sl,data);
-        k->ouder=0;
+    if(deBinboom.k==0){
+        deBinboom.k=new Binknoop<Sleutel,Data>(sl,data);
+        deBinboom.k->ouder=0;
     }
     else
-        voegtoe(&k,sl,data);
+        voegtoe(*(deBinboom.k),sl,data);
 }
-void Zoekboom<Sleutel,Data>::voegtoe(Binknoop<Sleutel,Data>knoop, const Sleutel& sl,const Data& data){
-    Binboom<Sleutel,Data> *kind;
+
+template <class Sleutel, class Data>
+void Zoekboom<Sleutel,Data>::voegtoe(Binknoop<Sleutel,Data> &knoop, const Sleutel& sl,const Data& data){
+    Binboom<Sleutel,Data>* kind;
     if (sl < knoop.sl)
-        kind=knoop.links.k;
+        kind=&knoop.links;
     else
-        kind=knoop.rechts.k;
-    if (kind==0){
-        kind=new Binknoop<Sleutel,Data>(sl,data);
-        kind->ouder=& knoop;
+        kind=&knoop.rechts;
+    if (kind->k==0){
+        kind->k=new Binknoop<Sleutel,Data>(sl,data);
+        kind->k->ouder=&knoop;
     }
     else
-        voegtoe(&kind, sl,data);
+        voegtoe(*(kind->k), sl,data);
 }
 
 
@@ -254,4 +287,5 @@ void Binboom<Sleutel,Data>::schrijf(ostream& os) const{
     }
 }
 
-#endif // ZOEKBOOM_H_INCLUDED
+#endif
+
