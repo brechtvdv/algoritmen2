@@ -51,11 +51,19 @@
 #include <map>
 #include <stack>
 #include <exception>
+#include <queue>
 
-
+using std::cout;
+using std::endl;
+using std::pair;
+using std::vector;
+using std::iterator;
+using std::map;
+using std::queue;
 
 enum RichtType { GERICHT, ONGERICHT };
 
+enum Kleur { WIT, GRIJS, ZWART };
 
 class GraafExceptie : public std::logic_error {
 public:
@@ -124,6 +132,14 @@ typedef std::map<int, int>  Knoop;      // beeldt knoopnummer (van buur) af op v
     virtual void schrijfVerbinding(std::ostream &os, int v) const;
 
 
+    // Stap 1: omgekeerde graaf opstellen
+    // richting van elke verbinding omkeren
+    Graaf<RT> keerOm();
+
+    // Stap 2: Diepte-eerst zoeken
+    // Post-order nummeren
+    vector<int> diepte_eerst_zoeken();
+
 protected:
     // hulpfuncties
     void controleerKnoopnummer(int k) const;   // throw indien k ongeldig
@@ -144,6 +160,75 @@ std::ostream &operator<<(std::ostream& os, const Graaf<RT>& g);
 
 // --- implementatie ---
 
+template<RichtType RT>
+vector<int> Graaf<RT>::diepte_eerst_zoeken()
+{
+    vector<int> postordernummers(this->aantalKnopen());
+    int postordernr = 0;
+
+    vector<Kleur> kleuren(this->aantalKnopen(),WIT);
+
+    queue<int> q;
+
+    for(int start = 0; start < this->aantalKnopen(); start++)
+    {
+        if( kleuren[start] == WIT )
+        {
+            q.push(start);
+            while(q.size() > 0)
+            {
+                cout << "q size: " << q.size() << endl;
+                int huidig = q.front();
+                q.pop();
+
+                if(kleuren[huidig] == WIT)
+                {
+                    kleuren[huidig] = GRIJS;
+                    map<int,int>::iterator it = this->knopen[huidig].begin();
+                    while(it != this->knopen[huidig].end())
+                    {
+                        if(kleuren[it->first] == WIT)
+                        {
+                            q.push(it->first);
+                        }
+
+                        it++;
+                    }
+                    kleuren[huidig] = ZWART;
+                    postordernummers[huidig] = postordernr;
+                    postordernr++;
+                }
+            }
+        }
+    }
+
+
+
+
+
+    return postordernummers;
+}
+
+template<RichtType RT>
+Graaf<RT> Graaf<RT>::keerOm(){
+    cout << "keer om graaf: " << endl;
+    Graaf<RT> omgekeerde;
+    vector<Knoop> hulp(this->aantalKnopen());
+    omgekeerde.knopen = hulp; // init knopen
+
+    for(int i = 0; i<this->aantalKnopen(); i++)
+    {
+        Knoop van = this->knopen[i];
+        map<int,int>::iterator it = van.begin();
+        while(it != van.end())
+        {
+            omgekeerde.knopen[it->first][i,it->second]; // stl map insert pair
+            it++;
+        }
+    }
+
+    return omgekeerde;
+}
 
 template<RichtType RT>
 void Graaf<RT>::controleerKnoopnummer(int k) const{
