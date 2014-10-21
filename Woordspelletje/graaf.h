@@ -137,8 +137,12 @@ typedef std::map<int, int>  Knoop;      // beeldt knoopnummer (van buur) af op v
     Graaf<RT> keerOm();
 
     // Stap 2: Diepte-eerst zoeken
-    // Post-order nummeren
-    vector<int> diepte_eerst_zoeken();
+    // map: knoopnummer -> postordernummer
+    map<int, int> diepte_eerst_zoeken();
+
+    // Stap 3:
+    //
+    void componenten_maken(map<int,int> knooppostordermap);
 
 protected:
     // hulpfuncties
@@ -151,6 +155,7 @@ protected:
     int                 hoogsteVerbindingsnummer;
     RichtType           richttype;
     std::stack<int>     vrijgekomenVerbindingsnummers;
+public:    std::vector<int>    componenten;
 };
 
 
@@ -161,9 +166,76 @@ std::ostream &operator<<(std::ostream& os, const Graaf<RT>& g);
 // --- implementatie ---
 
 template<RichtType RT>
-vector<int> Graaf<RT>::diepte_eerst_zoeken()
+void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
 {
-    vector<int> postordernummers(this->aantalKnopen());
+    this->componenten.resize(this->aantalKnopen());
+
+    vector<Kleur> kleuren(this->aantalKnopen(),WIT);
+
+    int componentTeller = 0;
+
+    queue<int> q;
+
+    int aantal = this->aantalKnopen();
+    while ( aantal > 1 )
+    {
+        // hoogste postorder bepalen
+        // eerste keer is dit = aantal knopen
+        int max_knoop = 0;
+        int max_postorder = 0;
+        map<int,int>::iterator it = knoop_postordermap.begin();
+        while ( it != knoop_postordermap.end() )
+        {
+            if ( it->second > max_postorder )
+            {
+                max_knoop = it->first;
+                max_postorder = it->second;
+            }
+            it++;
+        }
+
+        int start = knoop_postordermap[max_knoop];
+        if( kleuren[start] == WIT )
+        {
+            q.push(start);
+            knoop_postordermap.erase(start);
+            cout << "verwijder " << start << endl;
+            aantal--;
+
+            while(q.size() > 0)
+            {
+                int huidig = q.front();
+                q.pop();
+
+                if(kleuren[huidig] == WIT)
+                {
+                    kleuren[huidig] = GRIJS;
+                    map<int,int>::iterator it = this->knopen[huidig].begin();
+                    while(it != this->knopen[huidig].end())
+                    {
+                        if(kleuren[it->first] == WIT)
+                        {
+                            q.push(it->first);
+                            aantal--;
+                            //knoop_postordermap.erase(it);
+                        }
+
+                        it++;
+                    }
+                    kleuren[huidig] = ZWART;
+                    componenten[huidig] = componentTeller;
+                }
+            }
+        }
+        componentTeller++;
+        cout << "aantal: " << aantal << endl;
+    }
+}
+
+template<RichtType RT>
+map<int, int> Graaf<RT>::diepte_eerst_zoeken()
+{
+    map<int, int> postordernummers;
     int postordernr = 0;
 
     vector<Kleur> kleuren(this->aantalKnopen(),WIT);
@@ -177,7 +249,6 @@ vector<int> Graaf<RT>::diepte_eerst_zoeken()
             q.push(start);
             while(q.size() > 0)
             {
-                cout << "q size: " << q.size() << endl;
                 int huidig = q.front();
                 q.pop();
 
@@ -202,16 +273,11 @@ vector<int> Graaf<RT>::diepte_eerst_zoeken()
         }
     }
 
-
-
-
-
     return postordernummers;
 }
 
 template<RichtType RT>
 Graaf<RT> Graaf<RT>::keerOm(){
-    cout << "keer om graaf: " << endl;
     Graaf<RT> omgekeerde;
     vector<Knoop> hulp(this->aantalKnopen());
     omgekeerde.knopen = hulp; // init knopen
