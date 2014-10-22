@@ -227,12 +227,10 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
         }
 
         int start = max_knoop;
-        cout << "start met: " << start << " " << knoop_postordermap.size()<< endl;
+        //cout << "start met: " << start << " " << knoop_postordermap.size()<< endl;
         if( kleuren[start] == WIT )
         {
             s.push(start);
-            //knoop_postordermap.erase(start);
-            //cout << "verwijder " << start << endl;
 
             while(s.size() > 0)
             {
@@ -247,8 +245,6 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
                         if(kleuren[it->first] == WIT)
                         {
                             s.push(it->first);
-                            //cout << "verwijder " << it->first << endl;
-                            //knoop_postordermap.erase(it->first);
                         }
                         it++;
                     }
@@ -257,7 +253,7 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
                 {
                     kleuren[huidig] = ZWART;
                     componenten[huidig] = componentTeller;
-                    cout << "verwijder " << huidig << endl;
+                    //cout << "verwijder " << huidig << endl;
                     knoop_postordermap.erase(huidig);
                     s.pop();
                 }
@@ -269,21 +265,10 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
         else if (kleuren[start] == ZWART)
         {
             cout << "MAYDAY" << endl;
-
         }
 
-        //map<int,int>::iterator it2 = knoop_postordermap.begin();
-          //          while(it2 != knoop_postordermap.end())
-            //        {
-              //          cout << it2->first << " " << it2->second << endl;
-                //    }
-                    // cout << endl;
-                    // cout << endl;
-
         componentTeller++;
-
-                cout << "SIZE/ " << knoop_postordermap.size() << endl;
-
+        //cout << "SIZE/ " << knoop_postordermap.size() << endl;
     }
 }
 
@@ -329,7 +314,7 @@ map<int, int> Graaf<RT>::diepte_eerst_zoeken()
                     s.pop();
                 }
                 else {
-                    //cout << "MAYDAY" << endl;
+                    cout << "MAYDAY" << endl;
                 }
             }
         }

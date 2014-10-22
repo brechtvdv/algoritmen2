@@ -41,10 +41,10 @@ int main()
         cout << i << " " << g.componenten[i] << endl;
     }
 
-    // // componentgraaf maken
-    // Graaf<GERICHT> b;
-    // b.wordt_componentengraaf_van(g);
-    //cout << b << endl;
+    // componentgraaf maken
+    Graaf<GERICHT> b;
+    b.wordt_componentengraaf_van(g);
+    cout << b << endl;
 
 
 
