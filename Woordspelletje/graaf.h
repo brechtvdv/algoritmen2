@@ -178,8 +178,7 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
 
     stack<int> s;
 
-    int aantal = this->aantalKnopen();
-    while ( aantal > 1 )
+    while ( knoop_postordermap.size() > 0 )
     {
         // hoogste postorder bepalen
         // eerste keer is dit = aantal knopen
@@ -196,13 +195,12 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
             it++;
         }
 
-        int start = knoop_postordermap[max_knoop];
+        int start = max_knoop;
         if( kleuren[start] == WIT )
         {
             s.push(start);
             knoop_postordermap.erase(start);
             cout << "verwijder " << start << endl;
-            aantal--;
 
             while(s.size() > 0)
             {
@@ -218,7 +216,6 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
                         if(kleuren[it->first] == WIT)
                         {
                             s.push(it->first);
-                            aantal--;
                             cout << "verwijder " << it->first << endl;
                             knoop_postordermap.erase(it);
                         }
@@ -231,7 +228,6 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
             }
         }
         componentTeller++;
-        cout << "aantal: " << aantal << endl;
     }
 }
 
