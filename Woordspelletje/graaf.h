@@ -146,6 +146,9 @@ typedef std::map<int, int>  Knoop;      // beeldt knoopnummer (van buur) af op v
     //
     void componenten_maken(map<int,int> knooppostordermap);
 
+    // Componentgraaf maken van graaf
+    void wordt_componentengraaf_van(const Graaf&);
+
 protected:
     // hulpfuncties
     void controleerKnoopnummer(int k) const;   // throw indien k ongeldig
@@ -168,6 +171,34 @@ std::ostream &operator<<(std::ostream& os, const Graaf<RT>& g);
 // --- implementatie ---
 
 template<RichtType RT>
+void Graaf<RT>::wordt_componentengraaf_van(const Graaf& a)
+{
+    int hoogste_componentnr = 0;
+    // aantal componenten
+    for(int i=0;i<a.componenten.size(); i++)
+    {
+        if ( a.componenten[i] > hoogste_componentnr )
+            hoogste_componentnr = a.componenten[i];
+    }
+
+    this->knopen.resize(hoogste_componentnr+1);
+    this->hoogsteVerbindingsnummer = a.hoogsteVerbindingsnummer;
+
+    for(int i=0;i<a.aantalKnopen();i++)
+    {
+        Knoop k = a.knopen[i];
+        map<int,int>::iterator it = k.begin();
+        while(it != k.end())
+        {
+            int eigencomponentnr = a.componenten[i];
+            int buurcomponentnr = a.componenten[it->first];
+            int verbindingsnr = it->second;
+            this->knopen[eigencomponentnr][buurcomponentnr] = verbindingsnr; // stl map insert pair
+            it++;
+        }
+    }
+}
+template<RichtType RT>
 void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
 {
     this->componenten.resize(this->aantalKnopen());
@@ -178,7 +209,7 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
 
     stack<int> s;
 
-    while ( knoop_postordermap.size() > 0 )
+    while ( knoop_postordermap.size() > 2 )
     {
         // hoogste postorder bepalen
         // eerste keer is dit = aantal knopen
@@ -205,7 +236,6 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
             while(s.size() > 0)
             {
                 int huidig = s.top();
-                s.pop();
 
                 if(kleuren[huidig] == WIT)
                 {
@@ -219,15 +249,33 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
                             cout << "verwijder " << it->first << endl;
                             knoop_postordermap.erase(it);
                         }
-
                         it++;
                     }
+                }
+                else if( kleuren[huidig] == GRIJS )
+                {
                     kleuren[huidig] = ZWART;
                     componenten[huidig] = componentTeller;
+                    s.pop();
+                }
+                else {
+                    cout << "MAYDAY" << endl;
                 }
             }
         }
+
+        //map<int,int>::iterator it2 = knoop_postordermap.begin();
+          //          while(it2 != knoop_postordermap.end())
+            //        {
+              //          cout << it2->first << " " << it2->second << endl;
+                //    }
+                    cout << endl;
+                    cout << endl;
+
         componentTeller++;
+
+                cout << "SIZE/ " << knoop_postordermap.size() << endl;
+
     }
 }
 
