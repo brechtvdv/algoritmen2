@@ -42,11 +42,17 @@ int main()
     }
 
     // componentgraaf maken
-    Graaf<GERICHT> b;
-    b.wordt_componentengraaf_van(g);
-    cout << b << endl;
+    // Graaf<GERICHT> b;
+    // b.wordt_componentengraaf_van(g);
+    // cout << b << endl;
 
 
+    cout << "kring: ";
+    vector<int> kring = g.zoek_kring(1,2);
+    for(int i = 0; i < kring.size(); i++) {
+        cout << kring[i] << " ";
+    }
+    cout << endl;
 
     return 0;
 }
