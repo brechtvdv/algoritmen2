@@ -247,8 +247,8 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
                         if(kleuren[it->first] == WIT)
                         {
                             s.push(it->first);
-                            cout << "verwijder " << it->first << endl;
-                            knoop_postordermap.erase(it->first);
+                            //cout << "verwijder " << it->first << endl;
+                            //knoop_postordermap.erase(it->first);
                         }
                         it++;
                     }
