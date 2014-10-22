@@ -14,6 +14,7 @@ int main()
 
     g.voegVerbindingToe(0,2);
     g.voegVerbindingToe(2,1);
+    g.voegVerbindingToe(1,2);
 
     // stap 1
     Graaf<GERICHT> omg = g.keerOm();
@@ -39,6 +40,12 @@ int main()
     {
         cout << i << " " << g.componenten[i] << endl;
     }
+
+    // componentgraaf maken
+    Graaf<GERICHT> b;
+    b.wordt_componentengraaf_van(g);
+
+    cout << b << endl;
 
 
 

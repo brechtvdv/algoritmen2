@@ -209,7 +209,7 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
 
     stack<int> s;
 
-    while ( knoop_postordermap.size() > 2 )
+    while ( knoop_postordermap.size() > 0 )
     {
         // hoogste postorder bepalen
         // eerste keer is dit = aantal knopen
@@ -230,8 +230,8 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
         if( kleuren[start] == WIT )
         {
             s.push(start);
-            knoop_postordermap.erase(start);
-            cout << "verwijder " << start << endl;
+            //knoop_postordermap.erase(start);
+            //cout << "verwijder " << start << endl;
 
             while(s.size() > 0)
             {
@@ -256,12 +256,19 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
                 {
                     kleuren[huidig] = ZWART;
                     componenten[huidig] = componentTeller;
+                    cout << "verwijder " << huidig << endl;
+                    knoop_postordermap.erase(huidig);
                     s.pop();
                 }
                 else {
                     cout << "MAYDAY" << endl;
                 }
             }
+        }
+        else if (kleuren[start] == ZWART)
+        {
+            cout << "MAYDAY" << endl;
+
         }
 
         //map<int,int>::iterator it2 = knoop_postordermap.begin();
