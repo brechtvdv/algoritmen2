@@ -227,6 +227,7 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
         }
 
         int start = max_knoop;
+        cout << "start met: " << start << " " << knoop_postordermap.size()<< endl;
         if( kleuren[start] == WIT )
         {
             s.push(start);
@@ -247,7 +248,7 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
                         {
                             s.push(it->first);
                             cout << "verwijder " << it->first << endl;
-                            knoop_postordermap.erase(it);
+                            knoop_postordermap.erase(it->first);
                         }
                         it++;
                     }
@@ -276,8 +277,8 @@ void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
             //        {
               //          cout << it2->first << " " << it2->second << endl;
                 //    }
-                    cout << endl;
-                    cout << endl;
+                    // cout << endl;
+                    // cout << endl;
 
         componentTeller++;
 
@@ -298,7 +299,7 @@ map<int, int> Graaf<RT>::diepte_eerst_zoeken()
 
     for(int start = 0; start < this->aantalKnopen(); start++)
     {
-        cout << "start" << start << endl;
+        //cout << "start" << start << endl;
         if( kleuren[start] == WIT )
         {
             s.push(start);
@@ -322,13 +323,13 @@ map<int, int> Graaf<RT>::diepte_eerst_zoeken()
                 else if( kleuren[huidig] == GRIJS )
                 {
                     kleuren[huidig] = ZWART;
-                    cout << "Knoop: " << huidig << "krijgt postordernr " << postordernr << endl;
+                    //cout << "Knoop: " << huidig << "krijgt postordernr " << postordernr << endl;
                     postordernummers[huidig] = postordernr;
                     postordernr++;
                     s.pop();
                 }
                 else {
-                    cout << "MAYDAY" << endl;
+                    //cout << "MAYDAY" << endl;
                 }
             }
         }
