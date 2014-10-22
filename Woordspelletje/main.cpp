@@ -19,7 +19,7 @@ int main()
     // stap 1
     Graaf<GERICHT> omg = g.keerOm();
 
-    //cout << g << endl;
+    cout << g << endl;
     //cout << omg << endl;
 
     // stap 2
@@ -46,7 +46,8 @@ int main()
     b.wordt_componentengraaf_van(g);
     cout << b << endl;
 
-
+    // controle component 2 -> 1 kan bereiken
+    cout << b.isBereikbaar(2,1) << endl;
 
     return 0;
 }

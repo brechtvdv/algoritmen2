@@ -147,7 +147,11 @@ typedef std::map<int, int>  Knoop;      // beeldt knoopnummer (van buur) af op v
     void componenten_maken(map<int,int> knooppostordermap);
 
     // Componentgraaf maken van graaf
+    // vector<Knoop> : knoop stelt een component voor
     void wordt_componentengraaf_van(const Graaf&);
+
+    // in een componentengraaf is een knoop een component
+    bool isBereikbaar(int knoop_a, int knoop_b);
 
 protected:
     // hulpfuncties
@@ -169,6 +173,23 @@ std::ostream &operator<<(std::ostream& os, const Graaf<RT>& g);
 
 
 // --- implementatie ---
+
+template<RichtType RT>
+bool Graaf<RT>::isBereikbaar(int knoop_a, int knoop_b)
+{
+    bool isBereikbaar = false;
+
+    Knoop a = this->knopen[knoop_a];
+    map<int,int>::iterator it = a.begin();
+    while ( it != a.end() )    // buren overlopen
+    {
+        if ( it->first == knoop_b )
+            isBereikbaar = true;
+        it++;
+    }
+
+    return isBereikbaar;
+}
 
 template<RichtType RT>
 void Graaf<RT>::wordt_componentengraaf_van(const Graaf& a)
@@ -193,7 +214,10 @@ void Graaf<RT>::wordt_componentengraaf_van(const Graaf& a)
             int eigencomponentnr = a.componenten[i];
             int buurcomponentnr = a.componenten[it->first];
             int verbindingsnr = it->second;
-            this->knopen[eigencomponentnr][buurcomponentnr] = verbindingsnr; // stl map insert pair
+            if(  eigencomponentnr != buurcomponentnr )
+            {
+                this->knopen[eigencomponentnr][buurcomponentnr] = verbindingsnr; // stl map insert pair
+            }
             it++;
         }
     }
