@@ -156,10 +156,12 @@ class Graaf{
 
         // zoekt een weg van a naar b;
         // geeft vector terug met de gevolgde weg van de kring
+        // Werkt enkel op knopen die in zelfde component zitten
         // gaat er van uit dat de weg mogelijk is
         vector<int> zoek_pad(int a, int b);
 
         // zoekt een weg van a naar b en terug;
+        // (werkt dus enkel op knopen die in zelfde component zitten)
         // geeft vector terug met de gevolgde weg van de kring
         // gaat er van uit dat de weg mogelijk is
         vector<int> zoek_kring(int a, int b);
@@ -378,8 +380,6 @@ Graaf<RT> Graaf<RT>::keerOm(){
     return omgekeerde;
 }
 
-// Kijkt of het mogelijk is om van a naar b te gaan en omgekeerd.
-// Maw; kijkt of knoop in zelfde sterk samenhangende component zit
 template<RichtType RT>
 bool Graaf<RT>::is_bereikbaar_kring(int a, int b)
 {
