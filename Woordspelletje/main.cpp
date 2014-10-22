@@ -19,7 +19,7 @@ int main()
     // stap 1
     Graaf<GERICHT> omg = g.keerOm();
 
-    //cout << g << endl;
+    cout << g << endl;
     //cout << omg << endl;
 
     // stap 2
@@ -45,7 +45,6 @@ int main()
     // Graaf<GERICHT> b;
     // b.wordt_componentengraaf_van(g);
     // cout << b << endl;
-
 
     cout << "kring: ";
     vector<int> kring = g.zoek_kring(1,2);

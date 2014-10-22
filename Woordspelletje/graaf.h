@@ -152,6 +152,8 @@ class Graaf{
         // Maw; kijkt of knoop in zelfde sterk samenhangende component zit
         bool is_bereikbaar_kring(int a, int b);
 
+        bool isBereikbaar(int, int);
+
         // zoekt een weg van a naar b;
         // geeft vector terug met de gevolgde weg van de kring
         // gaat er van uit dat de weg mogelijk is
@@ -183,6 +185,23 @@ std::ostream &operator<<(std::ostream& os, const Graaf<RT>& g);
 // --- implementatie ---
 
 template<RichtType RT>
+bool Graaf<RT>::isBereikbaar(int knoop_a, int knoop_b)
+{
+    bool isBereikbaar = false;
+
+    Knoop a = this->knopen[knoop_a];
+    map<int,int>::iterator it = a.begin();
+    while ( it != a.end() )    // buren overlopen
+    {
+        if ( it->first == knoop_b )
+            isBereikbaar = true;
+        it++;
+    }
+
+    return isBereikbaar;
+}
+
+template<RichtType RT>
 void Graaf<RT>::wordt_componentengraaf_van(const Graaf& a)
 {
     int hoogste_componentnr = 0;
@@ -205,7 +224,8 @@ void Graaf<RT>::wordt_componentengraaf_van(const Graaf& a)
             int eigencomponentnr = a.componenten[i];
             int buurcomponentnr = a.componenten[it->first];
             int verbindingsnr = it->second;
-            if(eigencomponentnr != buurcomponentnr)
+
+            if(  eigencomponentnr != buurcomponentnr )
             {
                 this->knopen[eigencomponentnr][buurcomponentnr] = verbindingsnr; // stl map insert pair
             }
@@ -382,7 +402,6 @@ vector<int> Graaf<RT>::zoek_pad(int a, int b)
     // loop alle niveaus af, tot hij gevonden is
     while(!gevonden && q.size() > 0)
     {
-        cout << "in "<< endl;
         int niveau_size = q.size();
 
         // loop het huidig niveau van de queue af
@@ -392,11 +411,9 @@ vector<int> Graaf<RT>::zoek_pad(int a, int b)
             map<int,int>::iterator it = this->knopen[q.front()].begin();
             while(!gevonden && it != this->knopen[q.front()].end())
             {
-                cout << "kijk" << componenten[it->first] << componenten[a]<< endl;
                 // kijk of verbinding in dezelfde component is en of knoop nog wit is
                 if(componenten[it->first] == componenten[a] && knoop_kleur[it->first] == WIT)
                 {
-                    cout << "kkijk" << endl;
                     knoop_kleur[it->first] = GRIJS;
                     knoop_ouderknoop[it->first] = q.front();
                     knoop_ouder_verbinding[it->first] = it->second;
@@ -433,17 +450,6 @@ vector<int> Graaf<RT>::zoek_kring(int a, int b) {
 
     return heen;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 template<RichtType RT>
 void Graaf<RT>::controleerKnoopnummer(int k) const{
