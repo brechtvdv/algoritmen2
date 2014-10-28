@@ -64,12 +64,11 @@ using std::queue;
 using std::stack;
 
 enum RichtType { GERICHT, ONGERICHT };
-
 enum Kleur { WIT, GRIJS, ZWART };
 
 class GraafExceptie : public std::logic_error {
-public:
-    GraafExceptie(const std::string &boodschap_) : std::logic_error(boodschap_) {}
+    public:
+        GraafExceptie(const std::string &boodschap_) : std::logic_error(boodschap_) {}
 };
 
 std::ostream &operator<<(std::ostream &os, const GraafExceptie& exc){
@@ -79,94 +78,107 @@ std::ostream &operator<<(std::ostream &os, const GraafExceptie& exc){
 
 template<RichtType RT>
 class Graaf{
-public:
-typedef std::map<int, int>  Knoop;      // beeldt knoopnummer (van buur) af op verbindingsnummer
+    public:
+        typedef std::map<int, int>  Knoop;      // beeldt knoopnummer (van buur) af op verbindingsnummer
 
-    // Construeert een graaf met gegeven RichtType en aantal knopen (default 0), zonder verbindingen.
-    Graaf(int n=0);
-    // Geeft true indien het richttype GERICHT is, false indien het ONGERICHT is.
-    bool isGericht() const;
+        // Construeert een graaf met gegeven RichtType en aantal knopen (default 0), zonder verbindingen.
+        Graaf(int n=0);
+        // Geeft true indien het richttype GERICHT is, false indien het ONGERICHT is.
+        bool isGericht() const;
 
-    // Voegt een nieuwe 'lege' knoop toe, d.w.z. zonder verbindingen.
-    // Geeft knoopnummer van toegevoegde knoop terug (begint bij 0).
-    virtual int voegKnoopToe();
+        // Voegt een nieuwe 'lege' knoop toe, d.w.z. zonder verbindingen.
+        // Geeft knoopnummer van toegevoegde knoop terug (begint bij 0).
+        virtual int voegKnoopToe();
 
-    // Voegt verbinding toe tussen knoopnummers 'van' en 'naar'.
-    // Gooit GraafExceptie indien verbinding al bestaat of knoopnummers ongeldig zijn.
-    // Geeft verbindingsnummer van toegevoegde verbinding terug (begint bij 0).
-    // Bij ongerichte graaf wordt terugverbinding ook toegevoegd (met zelfde verbindingnummer!)
-    virtual int voegVerbindingToe(int van, int naar);
+        // Voegt verbinding toe tussen knoopnummers 'van' en 'naar'.
+        // Gooit GraafExceptie indien verbinding al bestaat of knoopnummers ongeldig zijn.
+        // Geeft verbindingsnummer van toegevoegde verbinding terug (begint bij 0).
+        // Bij ongerichte graaf wordt terugverbinding ook toegevoegd (met zelfde verbindingnummer!)
+        virtual int voegVerbindingToe(int van, int naar);
 
-    // Verwijdert de verbinding tussen knoopnummers 'van' en 'naar', incl. de terugverbinding indien ongericht.
-    // Gooit GraafExceptie indien knoopnummers ongeldig zijn.
-    // Geen exceptie indien de verbinding niet bestond.
-    // Andere verbindingen worden niet 'hernummerd'. Er komen dus mogelijks "gaten" in de verbindingsnummers.
-    virtual void verwijderVerbinding(int van, int naar);
+        // Verwijdert de verbinding tussen knoopnummers 'van' en 'naar', incl. de terugverbinding indien ongericht.
+        // Gooit GraafExceptie indien knoopnummers ongeldig zijn.
+        // Geen exceptie indien de verbinding niet bestond.
+        // Andere verbindingen worden niet 'hernummerd'. Er komen dus mogelijks "gaten" in de verbindingsnummers.
+        virtual void verwijderVerbinding(int van, int naar);
 
-    // Geeft het aantal knopen van de graaf.
-    int aantalKnopen() const;
+        // Geeft het aantal knopen van de graaf.
+        int aantalKnopen() const;
 
-    // Geeft het aantal verbindingen van de graaf.
-    // Bij ongerichte graaf worden verbindingen NIET dubbel geteld!
-    int aantalVerbindingen() const;
+        // Geeft het aantal verbindingen van de graaf.
+        // Bij ongerichte graaf worden verbindingen NIET dubbel geteld!
+        int aantalVerbindingen() const;
 
-    // Geeft het verbindingsnummer van de verbinding tussen 'van' en 'naar'.
-    // Geeft -1 indien die verbinding niet bestaat.
-    // Gooit een GraafExceptie indien knoopnummers ongeldig zijn.
-    // Opgelet: performantie is O(log(v)) waarbij v aantal verbindingen vanuit 'van' is.
-    int verbindingsnummer(int van, int naar) const;
+        // Geeft het verbindingsnummer van de verbinding tussen 'van' en 'naar'.
+        // Geeft -1 indien die verbinding niet bestaat.
+        // Gooit een GraafExceptie indien knoopnummers ongeldig zijn.
+        // Opgelet: performantie is O(log(v)) waarbij v aantal verbindingen vanuit 'van' is.
+        int verbindingsnummer(int van, int naar) const;
 
-    // Verwijdert alle knopen en verbindingen en herstart de verbindingsnummer
-    virtual void wis();
+        // Verwijdert alle knopen en verbindingen en herstart de verbindingsnummer
+        virtual void wis();
 
-    // Toegang tot de knopen:
-    const Knoop &operator[](int i) const { return knopen[i]; }
-          Knoop &operator[](int i)       { return knopen[i]; }  // deze kan als lvalue gebruikt worden
-
-
-    // Schrijft de gegevens van de volledige graaf naar outputstream os.
-    virtual void schrijf(std::ostream &os) const;
-
-    // Schrijft de gegevens van de knoop met knoopnummer k naar outputstream os.
-    virtual void schrijfKnoop(std::ostream &os, int k) const;
-
-    // Schrijft de gegevens van de verbinding met verbindingsnummer v naar outputstream os.
-    virtual void schrijfVerbinding(std::ostream &os, int v) const;
+        // Toegang tot de knopen:
+        const Knoop &operator[](int i) const { return knopen[i]; }
+              Knoop &operator[](int i)       { return knopen[i]; }  // deze kan als lvalue gebruikt worden
 
 
-    // Stap 1: omgekeerde graaf opstellen
-    // richting van elke verbinding omkeren
-    Graaf<RT> keerOm();
+        // Schrijft de gegevens van de volledige graaf naar outputstream os.
+        virtual void schrijf(std::ostream &os) const;
 
-    // Stap 2: Diepte-eerst zoeken
-    // map: knoopnummer -> postordernummer
-    map<int, int> diepte_eerst_zoeken();
+        // Schrijft de gegevens van de knoop met knoopnummer k naar outputstream os.
+        virtual void schrijfKnoop(std::ostream &os, int k) const;
 
-    // Stap 3:
-    //
-    void componenten_maken(map<int,int> knooppostordermap);
+        // Schrijft de gegevens van de verbinding met verbindingsnummer v naar outputstream os.
+        virtual void schrijfVerbinding(std::ostream &os, int v) const;
 
-    // Componentgraaf maken van graaf
-    // vector<Knoop> : knoop stelt een component voor
-    void wordt_componentengraaf_van(const Graaf&);
 
-    // in een componentengraaf is een knoop een component
-    bool isBereikbaar(int knoop_a, int knoop_b);
+        // Stap 1: omgekeerde graaf opstellen
+        // richting van elke verbinding omkeren
+        Graaf<RT> keerOm();
 
-protected:
-    // hulpfuncties
-    void controleerKnoopnummer(int k) const;   // throw indien k ongeldig
-    void voegVerbindingToeInDatastructuur(int van, int naar,int verbindingsnummer);
-    void verwijderVerbindingUitDatastructuur(int van, int naar);
-protected:
-    //datavelden
-    std::vector<Knoop>  knopen;
-    int                 hoogsteVerbindingsnummer;
-    RichtType           richttype;
-    std::stack<int>     vrijgekomenVerbindingsnummers;
-public:    std::vector<int>    componenten;
+        // Stap 2: Diepte-eerst zoeken
+        // map: knoopnummer -> postordernummer
+        map<int, int> diepte_eerst_zoeken();
+
+        // Stap 3:
+        //
+        void componenten_maken(map<int,int> knooppostordermap);
+
+        // Componentgraaf maken van graaf
+        void wordt_componentengraaf_van(const Graaf&);
+
+        // Kijkt of het mogelijk is om van a naar b te gaan en omgekeerd.
+        // Maw; kijkt of knoop in zelfde sterk samenhangende component zit
+        bool is_bereikbaar_kring(int a, int b);
+
+        bool isBereikbaar(int, int);
+
+        // zoekt een weg van a naar b;
+        // geeft vector terug met de gevolgde weg van de kring
+        // Werkt enkel op knopen die in zelfde component zitten
+        // gaat er van uit dat de weg mogelijk is
+        vector<int> zoek_pad(int a, int b);
+
+        // zoekt een weg van a naar b en terug;
+        // (werkt dus enkel op knopen die in zelfde component zitten)
+        // geeft vector terug met de gevolgde weg van de kring
+        // gaat er van uit dat de weg mogelijk is
+        vector<int> zoek_kring(int a, int b);
+
+    protected:
+        // hulpfuncties
+        void controleerKnoopnummer(int k) const;   // throw indien k ongeldig
+        void voegVerbindingToeInDatastructuur(int van, int naar,int verbindingsnummer);
+        void verwijderVerbindingUitDatastructuur(int van, int naar);
+    protected:
+        //datavelden
+        std::vector<Knoop>  knopen;
+        int                 hoogsteVerbindingsnummer;
+        RichtType           richttype;
+        std::stack<int>     vrijgekomenVerbindingsnummers;
+    public:    std::vector<int>    componenten;
 };
-
 
 template<RichtType RT>
 std::ostream &operator<<(std::ostream& os, const Graaf<RT>& g);
@@ -214,6 +226,7 @@ void Graaf<RT>::wordt_componentengraaf_van(const Graaf& a)
             int eigencomponentnr = a.componenten[i];
             int buurcomponentnr = a.componenten[it->first];
             int verbindingsnr = it->second;
+
             if(  eigencomponentnr != buurcomponentnr )
             {
                 this->knopen[eigencomponentnr][buurcomponentnr] = verbindingsnr; // stl map insert pair
@@ -222,6 +235,7 @@ void Graaf<RT>::wordt_componentengraaf_van(const Graaf& a)
         }
     }
 }
+
 template<RichtType RT>
 void Graaf<RT>::componenten_maken(map<int,int> knoop_postordermap)
 {
@@ -363,8 +377,78 @@ Graaf<RT> Graaf<RT>::keerOm(){
             it++;
         }
     }
-
     return omgekeerde;
+}
+
+template<RichtType RT>
+bool Graaf<RT>::is_bereikbaar_kring(int a, int b)
+{
+    return componenten[a] = componenten[b];
+}
+
+template<RichtType RT>
+vector<int> Graaf<RT>::zoek_pad(int a, int b)
+{
+    vector<Kleur> knoop_kleur(knopen.size(), WIT);
+    vector<int> knoop_ouderknoop(knopen.size());
+    vector<int> knoop_ouder_verbinding(knopen.size());
+    queue<int> q;
+    bool gevonden = false;
+    int aantal_verbindingen = 0;
+
+    q.push(a);
+    knoop_kleur[a] = GRIJS;
+
+    // loop alle niveaus af, tot hij gevonden is
+    while(!gevonden && q.size() > 0)
+    {
+        int niveau_size = q.size();
+
+        // loop het huidig niveau van de queue af
+        // kijk of een van de buren b is, zoniet, plaats ze op de queue
+        while(!gevonden && niveau_size > 0)
+        {
+            map<int,int>::iterator it = this->knopen[q.front()].begin();
+            while(!gevonden && it != this->knopen[q.front()].end())
+            {
+                // kijk of verbinding in dezelfde component is en of knoop nog wit is
+                if(componenten[it->first] == componenten[a] && knoop_kleur[it->first] == WIT)
+                {
+                    knoop_kleur[it->first] = GRIJS;
+                    knoop_ouderknoop[it->first] = q.front();
+                    knoop_ouder_verbinding[it->first] = it->second;
+                    if(it->first == b) {
+                        gevonden = true;
+                    }
+                }
+                it++;
+            }
+
+            niveau_size--;
+            q.pop();
+        }
+        aantal_verbindingen++;
+    }
+
+    // knoop is gevonden, maak nu de weg terug
+    int terugweg_knoop = b;
+    vector<int> weg(aantal_verbindingen);
+    for(int i = weg.size()-1; i >=0; i--)
+    {
+        weg[i] = knoop_ouder_verbinding[terugweg_knoop];
+        terugweg_knoop = knoop_ouderknoop[terugweg_knoop];
+    }
+
+    return weg;
+}
+
+template<RichtType RT>
+vector<int> Graaf<RT>::zoek_kring(int a, int b) {
+    vector<int> heen = this->zoek_pad(a, b);
+    vector<int> terug = this->zoek_pad(b,a);
+    heen.insert(heen.end(), terug.begin(), terug.end());
+
+    return heen;
 }
 
 template<RichtType RT>
