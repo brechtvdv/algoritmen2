@@ -1,4 +1,6 @@
 #include "stroomnet.h"
+#include "vergrotendpadzoeker.h"
+
 using std::cout;
 using std::endl;
 int main(){
@@ -19,6 +21,7 @@ int main(){
     GraafMetTakdata <GERICHT,int> gr2(gr);
     Pad<int> pad;
     Stroomnetwerk<int> sn(gr,1,4);
-    cout<<sn<<endl;
+    cout<<sn.geefCapaciteit()<<endl;
     assert(sn.geefCapaciteit()==13);
+
 }

@@ -1,104 +1,10 @@
 #ifndef __STROOMNET_H
 #define __STROOMNET_H
 
+#include "vergrotendpadzoeker.h"
 #include "graaf.h"
-#include <cassert>
-#include <iostream>
-using std::vector;
-using std::ostream;
-
-template< class T >
-class Pad:public std::vector< int >{
-public:
-    T geefCapaciteit() const{
-        return capaciteit;
-    }
-    void zetCapaciteit(const T& _capaciteit){
-        capaciteit=_capaciteit;
-    }
-friend ostream& operator<<(ostream& os, const Pad& p){
-    os<<"Capaciteit= "<<p.capaciteit<<" :: ";
-    if (p.size() > 0){
-        os<<p[0];
-    }
-    for (int i=1; i<p.size(); i++ ){
-        os<<"->"<<p[i];
-    }
-    os<<"\n";
-}
-protected:
-    T capaciteit;
-};
-/**********************************************************************
-
-   Class:Vergrotendpadzoeker
-
-   beschrijving: Methodeklasse die, gegeven een stroomnetwerk,
-                 en vergrotend pad teruggeeft.
-                 van en naar zijn de knoopnummers van bron en doel.
-
-
-***************************************************************************/
-template <class T>
-class Vergrotendpadzoeker{
-public:
-    Vergrotendpadzoeker(const GraafMetTakdata<GERICHT,T>& stroomnetwerk, int van, int naar, Pad<T>& pad);
-protected:
-    virtual void foo(int t, int x);
-    const GraafMetTakdata<GERICHT,T>& q;
-    Pad<T>& p;
-    vector<int> l;
-    vector<bool> m;
-    int v,v2;
-};
-
-
-template <class T>
-Vergrotendpadzoeker<T>::Vergrotendpadzoeker(const GraafMetTakdata<GERICHT ,T>& _q,int _v,int _v2,Pad<T>& _p):
-                    p(_p), q(_q),v(_v),v2(_v2),
-                    l(q.aantalKnopen()), m(q.aantalKnopen(),false){
-    p.clear();
-    assert(v != v2);
-    foo(v,0);
-    assert(p.size()!=1);
-    if (p.size() > 1){
-        T g=*q.geefTakdata(p[0],p[1]);
-        for (int i=2; i<p.size(); i++ ){
-            T ychg=*q.geefTakdata(p[i-1],p[i]);
-            if (ychg<g)
-                g=ychg;
-        }
-        p.zetCapaciteit(g);
-    }
-}
-
-template <class T>
-void Vergrotendpadzoeker<T>::foo(int t,int x){
-    m[t]=true;
-    const typename GraafMetTakdata<GERICHT,T>::Knoop& a=q[t];
-    int ychx=x+1;
-    for (typename GraafMetTakdata<GERICHT,T>::Knoop::const_iterator it=a.begin();
-                it!=a.end();it++){
-        int u=it->first;
-        if (*q.geefTakdata(t,u)> 0){
-            if (it->first==v2 && ychx+1 > p.size()){
-                l[v2]=t;
-                p.resize(ychx+1);
-                int ychf=v2;
-                int i=ychx;
-                while (ychf!=v){
-                    p[i--]=ychf;
-                    ychf=l[ychf];
-                }
-                p[0]=ychf;
-            }
-            else if(!m[u]){
-                l[u]=t;
-                foo(u,ychx);
-            }
-        }
-    }
-}
+using std::cout;
+using std::endl;
 
 /**********************************************************************
 
@@ -125,17 +31,62 @@ Stroomnetwerk(const GraafMetTakdata<GERICHT, T>& gr, int _van, int _naar):
     Pad<T> vergrotendpad;
     Vergrotendpadzoeker<T> vg(restnetwerk, van, naar, vergrotendpad);
     while(vergrotendpad.size() !=0 ){
+//        std::cout<<"Restnetwerk\n"<<restnetwerk<<"\n";
+//        std::cout<<"Vergrotend pad:\n"<<vergrotendpad<<"\n";
         restnetwerk-=vergrotendpad;
         *this+=vergrotendpad;
         Vergrotendpadzoeker<T> vg(restnetwerk, van, naar, vergrotendpad);
     }
+//        std::cout<<"Restnetwerk op einde\n"<<restnetwerk<<"\n";
 }
-
-int geefCapaciteit();
-
+Stroomnetwerk& operator-=(const Pad<T>& pad){
+    T padcapaciteit=pad.geefCapaciteit();
+    for (int i=1; i<pad.size(); i++ ){
+        int start=pad[i-1];//start en eind van de tak
+        int eind=pad[i];
+        int taknr=this->verbindingsnummer(start,eind);
+        assert (taknr >= 0);
+        assert(this->takdatavector[taknr]>=padcapaciteit);
+        this->takdatavector[taknr]-=padcapaciteit;
+//noot: eventueel tak met capaciteit 0 verwijderen.
+        vergrootTak(eind,start, padcapaciteit);
+    }
+}
+Stroomnetwerk& operator+=(const Pad<T>& pad){
+    T padcapaciteit=pad.geefCapaciteit();
+    for (int i=1; i<pad.size(); i++ ){
+        T nucapaciteit=padcapaciteit;
+        int van=pad[i-1];
+        int naar=pad[i];
+        int terugtak=this->verbindingsnummer(naar,van);
+        if (terugtak != -1){
+            if (this->takdatavector[terugtak] <= nucapaciteit){
+                nucapaciteit-=this->takdatavector[terugtak];
+                this->verwijderVerbinding(naar,van);
+                if (nucapaciteit > 0)
+                    vergrootTak(van, naar, nucapaciteit);
+            }else{
+                this->takdatavector[terugtak]-=nucapaciteit;
+            }
+        }else
+            vergrootTak(van, naar, padcapaciteit);
+    }
+}
+void vergrootTak(int start, int eind, T delta){
+        int taknr=this->verbindingsnummer(start,eind);
+        if (taknr==-1)
+            taknr=this->voegVerbindingToe(start,eind,delta);
+        else
+            this->takdatavector[taknr]+=delta;
+}
+T geefCapaciteit(){
+    T som=0;
+    for (typename GraafMetTakdata<GERICHT,T>::Knoop::const_iterator it=this->knopen[van].begin();
+                it!=this->knopen[van].end();it++)
+        som+=this->takdatavector[it->second];
+    return som;
+}
 protected:
 int van,naar;
 };
-
-
 #endif
