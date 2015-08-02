@@ -79,3 +79,5 @@ Desktop.ini
 
 # Android
 .csettings
+/B-trees/B-trees/dist/
+/Fibonacci_reworked/dist/
