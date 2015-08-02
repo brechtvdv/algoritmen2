@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <vector>
 #include "fibonacci.h"
 
 using namespace std;
@@ -15,44 +16,42 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
-    int * coefficients;
-    int * startValues;
+    vector<int> coefficients;
+    vector<int> startValues;
     
     // Read file fib.txt
     ifstream file;
     file.open("fib.txt");
 
-    int n; // Maximum amount of Fibonacci-numbers that can be calculated
-    file >> n;
-    
-    // Init
-    coefficients = new int[n];
-    startValues = new int[n];
+    int k; // Amount of coefficients/startValues
+    file >> k;
     
     // Read coefficients
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < k; i++) {
         int coefficient;
         file >> coefficient;
-        coefficients[i] = coefficient;
+        coefficients.push_back(coefficient);
     }
     
     // Read starting values
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < k; i++) {
         int startValue;
         file >> startValue;
-        startValues[i] = startValue;
+        startValues.push_back(startValue);
     }
     
-    // Read k-th Fibonacci number that we need to calculate
-    int k;
-    file >> k;
-    
     // Init Fibonacci-class
-    Fibonacci f(coefficients, startValues);
+    Fibonacci f(coefficients, startValues, k);
+    
+    // Read n-th Fibonacci number that we need to calculate
+    int n;
+    file >> n;
     
     // Calculate
-    f.calculate(k);
-
+    int fn = f.calculate(n);
+    
+    cout << "Fibonacci number of " << n << " is: " << fn << endl;
+    
     return 0;
 }
 
