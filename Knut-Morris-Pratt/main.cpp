@@ -43,5 +43,7 @@ int main(int argc, char** argv) {
     
     cout << naald << " komt "  << plaats.size() << " keer voor." << endl;
     
+//    cout << *(plaats.front()) << endl;
+    
     return 0;
 }
