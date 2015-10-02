@@ -1,5 +1,7 @@
 # Splaybomen
 
+<img src="dieptedata.png" width="600"/>
+
 Soms is het interessant om grafiekjes te kunnen bekijken. We laten uiteraard het eigenlijke werk, het tekenen van de grafiek, over aan iemand anders, en gebruiken een spreadsheet. Een voorbeeldje vind je in het programma zoekboomdiepte_Cpp11.cpp, dat de header puntgenerator.h gebruikt. Dit maakt een grafiek (wat die betekent zien we later) en slaat deze op in een bestand dieptedata.csv. Als je het programma laat lopen en dan dieptedata.csv inleest in je favoriete spreadsheet, zoals Excel of OpenOffice Calc, dan kan je met de diagramfunctie een grafiekje tekenen. Opmerking: dieptedata.csv is geschikt voor rekenbladprogramma's met een niet-Engelstalige instelling, waarbij vlottendekommagetallen worden voorgesteld met een vlottende komma. Hoe je een .csv-bestand produceert waar de vlottende komma vervangen is door een punt, vind je in de API van de klasse CsvData:
 
 De klasse CsvData wordt gedefinieerd in de header csv.h Elk object van de klasse komt overeen met één .csv-bestand, waarin getalwaarden worden opgeslagen. Vermits de meeste rekenbladen grafieken kunnen opmaken met verschillende gegevensreeksen, waarbij elke gegevensreeks standaard opgeslagen is in een kolom, slaat elke CsvData gegevens ook op deze manier op. De API is de volgende
