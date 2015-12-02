@@ -37,7 +37,7 @@ void Shiftand::search(std::queue<const uchar*>& places,
 	
 	for (int i=0; i<textLength; i++) {
 		r = r.shiftRight(1); // schuif
-		r |= Bitpattern::onebit(0); // 0 vanvoor zetten
+		r |= Bitpattern::onebit(0); // 1 vanvoor zetten
 		r &= letterPattern[text[i]]; // AND met patroon van de letter van de tekst
 		
 		//cout<<r<<endl;
